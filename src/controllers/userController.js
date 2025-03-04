@@ -212,12 +212,15 @@ export async function uploadAvatar(req, res) {
     const image = req.file; // multer middleware
 
     const upload = await uploadImageCloudinary(image);
+    
     const updateUser = await UserModel.findByIdAndUpdate(userId, {
       avatar: upload.url,
     });
 
     return res.json({
       msg: "Cargado el avatar al perfil",
+      error: false,
+      success: true,
       data: {
         _id: userId,
         avatar: upload.url,
@@ -422,7 +425,7 @@ export async function resetPassword(req, res) {
 export async function refreshToken(req, res) {
   try {
     const refreshToken =
-      req.cookies.refreshToken || req?.header?.authorization?.split(" ")[1];
+      req.cookies.refreshToken || req?.headers?.authorization?.split(" ")[1];
 
     if (!refreshToken) {
       return res.status(401).json({
