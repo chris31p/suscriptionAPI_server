@@ -19,7 +19,7 @@ app.use(cookieParser());
 const PORT = 4000 || process.env.PORT;
 
 app.get("/", (req, res)=>{
-    res.json({msg: "Servidor corriendo" + PORT})
+    res.json({msg: "Servidor corriendo en: " + PORT})
 })
 
 app.use('/api/user', userRouter)
