@@ -4,6 +4,8 @@ import dotenv from 'dotenv';
 import connectDB from './src/config/connectDB.js';
 import userRouter from './src/routes/userRoute.js';
 import cookieParser from 'cookie-parser'; 
+import categoryRouter from './src/routes/categoryRoute.js';
+import uploadRouter from './src/routes/uploadRouter.js';
 
 dotenv.config();
 
@@ -23,6 +25,8 @@ app.get("/", (req, res)=>{
 })
 
 app.use('/api/user', userRouter)
+app.use('/api/category', categoryRouter)
+app.use('/api/file', uploadRouter)
 
 connectDB().then(()=>{
     app.listen(PORT, ()=>{
