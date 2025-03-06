@@ -7,6 +7,10 @@ import cookieParser from 'cookie-parser';
 import categoryRouter from './src/routes/categoryRoute.js';
 import uploadRouter from './src/routes/uploadRouter.js';
 import subCategoryRouter from './src/routes/subCategoryRoute.js';
+import productRouter from './src/routes/productRoute.js';
+import addressRouter from './src/routes/addressRoute.js';
+import cartRouter from './src/routes/cartRoute.js';
+import orderRouter from './src/routes/orderRoute.js';
 
 dotenv.config();
 
@@ -29,6 +33,10 @@ app.use('/api/user', userRouter)
 app.use('/api/category', categoryRouter)
 app.use('/api/file', uploadRouter)
 app.use('/api/subcategory', subCategoryRouter)
+app.use('/api/product', productRouter)
+app.use("/api/address",addressRouter)
+app.use("/api/cart",cartRouter)
+app.use('/api/order',orderRouter)
 
 connectDB().then(()=>{
     app.listen(PORT, ()=>{
