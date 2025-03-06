@@ -1,4 +1,7 @@
 import CategoryModel from "../models/categoryModel.js";
+import subCategoryModel from '../models/subCategoryModel.js'
+import productModel from '../models/productoModel.js';
+
 
 export const addCategoryController = async (req, res) => {
   try {
@@ -88,3 +91,45 @@ export const updateCategoryController = async (req, res) => {
     });
   }
 };
+
+export const deleteCategoryController = async(req, res)=>{
+  try {
+    const {_id} = req.body;
+
+    const checkSubCategory = await subCategoryModel.find({
+      category: {
+        "$in": [_id]
+      }
+    }).countDocuments()
+
+    const checkProduct = await productModel.find({
+      category: {
+        "$in": [_id]
+      }
+    }).countDocuments()
+
+    if(checkSubCategory > 0 || checkProduct > 0){
+      return res.status(400).json({
+        msg: "Esta categoría se está usando, no puede eliminarse",
+        error: true,
+        success: false
+      })
+    }
+
+    const deleteCategory = await CategoryModel.deleteOne({_id : _id})
+    
+    return res.status(200).json({
+      msg: "Categoría eliminada exitosamente",
+      data: deleteCategory,
+      error: false,
+      success: true
+    })
+
+  } catch (error) {
+    return res.status(500).json({
+      msg: error.message || error,
+      error: true,
+      success: false,
+    });
+  }
+}
