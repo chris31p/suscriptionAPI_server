@@ -25,7 +25,7 @@ export const createProductController = async (req, res) => {
       !description
     ) {
       return res.status(400).json({
-        msg: "Llene todos los campos",
+        msg: "Todos los campos son requeridos",
         error: true,
         success: false,
       });
@@ -83,12 +83,12 @@ export const getProductController = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, totalCount] = await Promise.all([
-      ProductModel.find(query)
+      productModel.find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
         .populate("category subCategory"),
-      ProductModel.countDocuments(query),
+      productModel.countDocuments(query),
     ]);
 
     return res.json({
@@ -120,7 +120,7 @@ export const getProductByCategory = async (req, res) => {
       });
     }
 
-    const product = await ProductModel.find({
+    const product = await productModel.find({
       category: { $in: id },
     }).limit(15);
 
@@ -305,7 +305,7 @@ export const searchProduct = async (req, res) => {
     ]);
 
     return res.json({
-      msg: "Información del producto",
+      msg: "Datos del producto",
       error: false,
       success: true,
       data: data,

@@ -9,7 +9,7 @@ export const addCategoryController = async (req, res) => {
 
     if (!name || !image) {
       return res.status(400).json({
-        msg: "Ingrese los campos requeridos",
+        msg: "Todos los campos son requeridos",
         error: true,
         success: false,
       });
