@@ -1,4 +1,6 @@
 import productModel from "../models/productoModel.js";
+import mongoose from "mongoose";
+const { isValidObjectId } = mongoose;
 
 export const createProductController = async (req, res) => {
   try {
@@ -69,7 +71,7 @@ export const getProductController = async (req, res) => {
     }
 
     if (!limit) {
-      limit = 10;
+      limit = 5;
     }
 
     const query = search
@@ -83,7 +85,8 @@ export const getProductController = async (req, res) => {
     const skip = (page - 1) * limit;
 
     const [data, totalCount] = await Promise.all([
-      productModel.find(query)
+      productModel
+        .find(query)
         .sort({ createdAt: -1 })
         .skip(skip)
         .limit(limit)
@@ -92,7 +95,7 @@ export const getProductController = async (req, res) => {
     ]);
 
     return res.json({
-      msg: "Información del Producto",
+      msg: "Datos del producto",
       error: false,
       success: true,
       totalCount: totalCount,
@@ -120,11 +123,13 @@ export const getProductByCategory = async (req, res) => {
       });
     }
 
-    const product = await productModel.find({
-      category: { $in: id },
-    }).limit(15);
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ msg: "ID inválido", error: true });
+    }
 
-    return res.json({
+    const product = await productModel.find({ category: id }).limit(15);
+
+    return res.status(200).json({
       msg: "Lista de productos por categoría",
       data: product,
       error: false,
@@ -141,51 +146,31 @@ export const getProductByCategory = async (req, res) => {
 
 export const getProductByCategoryAndSubCategory = async (req, res) => {
   try {
-    const { categoryId, subCategoryId, page, limit } = req.body;
+    let { categoryId, subCategoryId } = req.body;
 
-    if (!categoryId || !subCategoryId) {
-      return res.status(400).json({
-        msg: "Proporcionar el ID de categoría y subcategoría",
-        error: true,
-        success: false,
-      });
+    // Validamos los ObjectId
+    if (!isValidObjectId(categoryId)) {
+      return res
+        .status(400)
+        .json({ msg: "categoryId inválido", error: true, success: false });
+    }
+    if (!isValidObjectId(subCategoryId)) {
+      return res
+        .status(400)
+        .json({ msg: "subCategoryId inválido", error: true, success: false });
     }
 
-    if (!page) {
-      page = 1;
-    }
+    // Convertimos los IDs en ObjectId
+    categoryId = new mongoose.Types.ObjectId(categoryId);
+    subCategoryId = new mongoose.Types.ObjectId(subCategoryId);
 
-    if (!limit) {
-      limit = 10;
-    }
-
-    const query = {
-      category: { $in: categoryId },
-      subCategory: { $in: subCategoryId },
-    };
-
-    const skip = (page - 1) * limit;
-
-    const [data, dataCount] = await Promise.all([
-      productModel.find(query).sort({ createdAt: -1 }).skip(skip).limit(limit),
-      productModel.countDocuments(query),
-    ]);
-
-    return res.json({
-      msg: "Lista de productos",
-      data: data,
-      totalCount: dataCount,
-      page: page,
-      limit: limit,
-      success: true,
-      error: false,
+    const productos = await productModel.find({
+      category: categoryId,
+      subCategory: subCategoryId,
     });
+    res.json({ success: true, productos });
   } catch (error) {
-    return res.status(500).json({
-      msg: error.message || error,
-      error: true,
-      success: false,
-    });
+    res.status(500).json({ msg: error.message, error: true, success: false });
   }
 };
 
@@ -193,9 +178,28 @@ export const getProductDetails = async (req, res) => {
   try {
     const { productId } = req.body;
 
+    // Verificamos si el ID es válido
+    if (!isValidObjectId(productId)) {
+      return res.status(400).json({
+        msg: "ID de producto inválido",
+        data: null,
+        error: true,
+        success: false,
+      });
+    }
+
     const product = await productModel.findOne({ _id: productId });
 
-    return res.json({
+    if (!product) {
+      return res.status(404).json({
+        msg: "Producto no encontrado",
+        data: null,
+        error: true,
+        success: false,
+      });
+    }
+
+    return res.status(200).json({
       msg: "Detalles del producto",
       data: product,
       error: false,
@@ -229,7 +233,7 @@ export const updateProductDetails = async (req, res) => {
       }
     );
 
-    return res.json({
+    return res.status(200).json({
       msg: "Producto actualizado exitosamente",
       data: updateProduct,
       error: false,
@@ -258,7 +262,7 @@ export const deleteProductDetails = async (req, res) => {
 
     const deleteProduct = await productModel.deleteOne({ _id: _id });
 
-    return res.json({
+    return res.status(200).json({
       msg: "Producto eliminado exitosamente",
       error: false,
       success: true,
@@ -304,7 +308,7 @@ export const searchProduct = async (req, res) => {
       productModel.countDocuments(query),
     ]);
 
-    return res.json({
+    return res.status(200).json({
       msg: "Datos del producto",
       error: false,
       success: true,

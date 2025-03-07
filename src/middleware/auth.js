@@ -27,7 +27,7 @@ const auth = async(req, res, next) => {
 
     } catch (error) {
         return res.status(500).json({
-            msg: error.message || error,
+            msg: "No has iniciado sesión",
             error: true,
             success: false
         })
