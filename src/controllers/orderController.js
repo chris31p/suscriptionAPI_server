@@ -1,4 +1,4 @@
-import priceWithDiscount from "../../../client/src/utils/priceWithDiscount.js";
+//import priceWithDiscount from "../../../client/src/utils/priceWithDiscount.js";
 import Stripe from "../config/stripe.js";
 import cartProductModel from "../models/cartProductModel.js";
 import orderModel from "../models/orderModel.js";
@@ -53,11 +53,13 @@ export async function cashOnDeliveryOrderController(req, res) {
   }
 }
 
-export const pricewithDiscount = (price, dis = 1) => {
-  const discountAmout = Math.ceil((Number(price) * Number(dis)) / 100);
-  const actualPrice = Number(price) - Number(discountAmout);
-  return actualPrice;
+const priceWithDiscount = (price, dis = 1) => {
+    const discountAmount = Math.round((Number(price) * Number(dis)) / 100);
+    const actualPrice = Math.round(Number(price) - discountAmount);
+    return actualPrice;
 };
+
+export default priceWithDiscount;
 
 export async function paymentController(req, res) {
   try {
@@ -69,7 +71,7 @@ export async function paymentController(req, res) {
     const line_items = list_items.map((item) => {
       return {
         price_data: {
-          currency: "CL",
+          currency: "clp",
           product_data: {
             name: item.productId.name,
             images: item.productId.image,
@@ -78,7 +80,7 @@ export async function paymentController(req, res) {
             },
           },
           unit_amount:
-            pricewithDiscount(item.productId.price, item.productId.discount) *
+            priceWithDiscount(item.productId.price, item.productId.discount) *
             100,
         },
         adjustable_quantity: {
@@ -150,12 +152,10 @@ const getOrderProductItems = async ({
   return productList;
 };
 
-//http://localhost:8080/api/order/webhook
+//http://localhost:4000/api/order/webhook
 export async function webhookStripe(req, res) {
   const event = req.body;
-  const endPointSecret = process.env.STRIPE_ENPOINT_WEBHOOK_SECRET_KEY;
-
-  console.log("event", event);
+  const endPointSecret = process.env.STRIPE_ENDPOINT_WEBHOOK_SECRET_KEY;
 
   // Handle the event
   switch (event.type) {
@@ -175,7 +175,6 @@ export async function webhookStripe(req, res) {
 
       const order = await orderModel.insertMany(orderProduct);
 
-      console.log(order);
       if (Boolean(order[0])) {
         const removeCartItems = await userModel.findByIdAndUpdate(userId, {
           shopping_cart: [],
