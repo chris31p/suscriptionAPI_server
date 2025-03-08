@@ -174,9 +174,7 @@ export async function webhookStripe(req, res) {
 
       const order = await orderModel.insertMany(orderProduct);
 
-      console.log("order antes del if:", order);
       if (Boolean(order[0])) {
-        console.log("Entró en el if");
         const removeCartItems = await userModel.updateOne(
           { _id: userId },
           { $set: { shopping_cart: [] } }
@@ -184,7 +182,6 @@ export async function webhookStripe(req, res) {
         const removeCartProductDB = await cartProductModel.deleteMany({
           userId: userId,
         });
-        console.log("order después del if:", order);
       }
       break;
     default:
