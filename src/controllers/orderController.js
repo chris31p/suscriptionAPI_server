@@ -54,9 +54,9 @@ export async function cashOnDeliveryOrderController(req, res) {
 }
 
 const priceWithDiscount = (price, dis = 1) => {
-    const discountAmount = Math.round((Number(price) * Number(dis)) / 100);
-    const actualPrice = Math.round(Number(price) - discountAmount);
-    return actualPrice;
+  const discountAmount = Math.round((Number(price) * Number(dis)) / 100);
+  const actualPrice = Math.round(Number(price) - discountAmount);
+  return actualPrice;
 };
 
 export default priceWithDiscount;
@@ -80,8 +80,7 @@ export async function paymentController(req, res) {
             },
           },
           unit_amount:
-            priceWithDiscount(item.productId.price, item.productId.discount) *
-            100,
+            priceWithDiscount(item.productId.price, item.productId.discount)
         },
         adjustable_quantity: {
           enabled: true,
@@ -175,13 +174,17 @@ export async function webhookStripe(req, res) {
 
       const order = await orderModel.insertMany(orderProduct);
 
+      console.log("order antes del if:", order);
       if (Boolean(order[0])) {
-        const removeCartItems = await userModel.findByIdAndUpdate(userId, {
-          shopping_cart: [],
-        });
+        console.log("Entró en el if");
+        const removeCartItems = await userModel.updateOne(
+          { _id: userId },
+          { $set: { shopping_cart: [] } }
+        );
         const removeCartProductDB = await cartProductModel.deleteMany({
           userId: userId,
         });
+        console.log("order después del if:", order);
       }
       break;
     default:
