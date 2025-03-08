@@ -140,8 +140,8 @@ const getOrderProductItems = async ({
         paymentId: paymentId,
         payment_status: payment_status,
         delivery_address: addressId,
-        subTotalAmt: Number(item.amount_total / 100),
-        totalAmt: Number(item.amount_total / 100),
+        subTotalAmt: Number(item.amount_total),
+        totalAmt: Number(item.amount_total),
       };
 
       productList.push(paylod);
