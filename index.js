@@ -15,10 +15,22 @@ import orderRouter from './src/routes/orderRoute.js';
 dotenv.config();
 
 const app = express()
-app.use(cors({
+
+const allowedOrigins = [
+    "http://localhost:5173", 
+    "https://apigreenmarket.netlify.app"
+  ];
+  
+  app.use(cors({
     credentials: true,
-    origin: process.env.FRONTEND_URL
-}));
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    }
+  }));
 
 app.use(express.json());
 app.use(cookieParser());
