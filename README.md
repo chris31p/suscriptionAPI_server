@@ -10,6 +10,14 @@ Este repositorio contiene el **backend** de GreenMarket 🥦, una API REST desar
 
 ---
 
+# Despliegue en Netlify
+
+**Link de la aplicación:**
+
+[(https://apigreenmarket.netlify.app/)](https://apigreenmarket.netlify.app/)
+
+---
+
 ## 🚀 **Tecnologías Implementadas**
 - **🛠️ Node.js + Express.js** - Framework backend para API REST.
 - **🔐 JWT + bcryptjs** - Autenticación y seguridad.
