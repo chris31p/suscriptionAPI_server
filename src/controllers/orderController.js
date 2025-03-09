@@ -79,8 +79,10 @@ export async function paymentController(req, res) {
               productId: item.productId._id,
             },
           },
-          unit_amount:
-            priceWithDiscount(item.productId.price, item.productId.discount)
+          unit_amount: priceWithDiscount(
+            item.productId.price,
+            item.productId.discount
+          ),
         },
         adjustable_quantity: {
           enabled: true,
@@ -152,6 +154,7 @@ const getOrderProductItems = async ({
 };
 
 //http://localhost:4000/api/order/webhook
+//https://apigreenmarket.netlify.app/api/order/webhook
 export async function webhookStripe(req, res) {
   const event = req.body;
   const endPointSecret = process.env.STRIPE_ENDPOINT_WEBHOOK_SECRET_KEY;
